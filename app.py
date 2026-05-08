@@ -10,37 +10,43 @@ st.title("🏫 학급 출결 리포트 생성기")
 uploaded_file = st.file_uploader("엑셀 업로드", type=["xlsx"])
 
 def preprocess(file):
-    df = pd.read_excel(file, header=7)
-    df = df.drop(0)
+    # 👉 그냥 전체 읽기 (헤더 추측 X)
+    raw = pd.read_excel(file, header=None)
+
+    # 👉 화면에 원본 보여주기 (확인용)
+    st.subheader("🔍 원본 데이터")
+    st.dataframe(raw)
 
     result = []
 
-    for _, row in df.iterrows():
+    for i in range(len(raw)):
+        row = raw.iloc[i]
+
         try:
-            # 👉 비어있는 행 걸러내기
-            if pd.isna(row.iloc[1]):
+            # 👉 이름이 있는 행만 필터
+            name = row[1]
+            if pd.isna(name):
                 continue
 
-            num = int(row.iloc[0])
-            name = str(row.iloc[1])
-            days = int(row.iloc[2])
+            num = int(row[0])
+            days = int(row[2])
 
-            # 👉 값 없으면 0 처리
-            absence = int(row.iloc[3]) if not pd.isna(row.iloc[3]) else 0
-            late = int(row.iloc[6]) if not pd.isna(row.iloc[6]) else 0
-            early = int(row.iloc[9]) if not pd.isna(row.iloc[9]) else 0
-            result_val = int(row.iloc[12]) if not pd.isna(row.iloc[12]) else 0
+            # 👉 여기 중요 (네 파일 구조 기준)
+            absence = int(row[3]) if not pd.isna(row[3]) else 0
+            late = int(row[6]) if not pd.isna(row[6]) else 0
+            early = int(row[9]) if not pd.isna(row[9]) else 0
+            result_val = int(row[12]) if not pd.isna(row[12]) else 0
 
             result.append([num, name, days, absence, late, early, result_val])
 
-        except Exception as e:
+        except:
             continue
 
-    new_df = pd.DataFrame(result, columns=[
+    df = pd.DataFrame(result, columns=[
         "번호","이름","수업일수","결석","지각","조퇴","결과"
     ])
 
-    return new_df
+    return df
 
 
 def highlight(row):
