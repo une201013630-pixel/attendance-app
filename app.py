@@ -9,13 +9,21 @@ uploaded_file = st.file_uploader("엑셀 업로드", type=["xlsx"])
 
 def preprocess(file):
     df = pd.read_excel(file, header=7)
+
+    # 첫 줄 제거
     df = df.drop(0)
 
-    # 컬럼 자동 처리
-    df = df.iloc[:, :10]  # 앞쪽 필요한 부분만 사용
+    # 🔥 실제 컬럼 확인 (문제 생기면 이걸로 확인)
+    # st.write(df.columns)
 
-    df.columns = ["번호","이름","수업일수","결석","지각","조퇴","결과",
-                  "col1","col2","col3"]
+    # 👉 필요한 컬럼만 선택 (엑셀 기준)
+    df = df[[
+        "번호", "성명", "수업일수",
+        "결석계", "지각계", "조퇴계", "결과계"
+    ]]
+
+    # 컬럼 이름 정리
+    df.columns = ["번호","이름","수업일수","결석","지각","조퇴","결과"]
 
     df = df.fillna(0)
     return df
@@ -24,10 +32,17 @@ def create_card(row):
     img = Image.new("RGB", (600, 300), "white")
     draw = ImageDraw.Draw(img)
 
-    color = "red" if row["결석"] >= 5 else "orange" if row["결석"] > 0 else "green"
+    # 🔴 조건 강조
+    if row["결석"] >= 5:
+        color = "red"
+    elif row["결석"] > 0:
+        color = "orange"
+    else:
+        color = "green"
 
     draw.text((20, 50), f"{int(row['번호'])}번 {row['이름']}", fill="black")
     draw.text((20, 120), f"결석 {int(row['결석'])}회", fill=color)
+    draw.text((20, 170), f"지각 {int(row['지각'])} / 조퇴 {int(row['조퇴'])}", fill="black")
 
     return img
 
