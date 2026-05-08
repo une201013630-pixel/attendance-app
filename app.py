@@ -13,16 +13,9 @@ def preprocess(file):
     # 첫 줄 제거
     df = df.drop(0)
 
-    # 🔥 실제 컬럼 확인 (문제 생기면 이걸로 확인)
-    # st.write(df.columns)
+    # 👉 필요한 열 위치로 정확히 선택 (너 엑셀 기준)
+    df = df.iloc[:, [0, 1, 2, 3, 6, 9, 12]]
 
-    # 👉 필요한 컬럼만 선택 (엑셀 기준)
-    df = df[[
-        "번호", "성명", "수업일수",
-        "결석계", "지각계", "조퇴계", "결과계"
-    ]]
-
-    # 컬럼 이름 정리
     df.columns = ["번호","이름","수업일수","결석","지각","조퇴","결과"]
 
     df = df.fillna(0)
@@ -32,7 +25,7 @@ def create_card(row):
     img = Image.new("RGB", (600, 300), "white")
     draw = ImageDraw.Draw(img)
 
-    # 🔴 조건 강조
+    # 🔴 강조 조건
     if row["결석"] >= 5:
         color = "red"
     elif row["결석"] > 0:
