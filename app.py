@@ -13,22 +13,27 @@ def preprocess(file):
     df = pd.read_excel(file, header=7)
     df = df.drop(0)
 
-    # 👉 실제 필요한 열만 정확히 추출 (네 파일 기준)
     result = []
 
     for _, row in df.iterrows():
         try:
+            # 👉 비어있는 행 걸러내기
+            if pd.isna(row.iloc[1]):
+                continue
+
             num = int(row.iloc[0])
-            name = row.iloc[1]
+            name = str(row.iloc[1])
             days = int(row.iloc[2])
 
-            absence = int(row.iloc[3])
-            late = int(row.iloc[6])
-            early = int(row.iloc[9])
-            result_val = int(row.iloc[12])
+            # 👉 값 없으면 0 처리
+            absence = int(row.iloc[3]) if not pd.isna(row.iloc[3]) else 0
+            late = int(row.iloc[6]) if not pd.isna(row.iloc[6]) else 0
+            early = int(row.iloc[9]) if not pd.isna(row.iloc[9]) else 0
+            result_val = int(row.iloc[12]) if not pd.isna(row.iloc[12]) else 0
 
             result.append([num, name, days, absence, late, early, result_val])
-        except:
+
+        except Exception as e:
             continue
 
     new_df = pd.DataFrame(result, columns=[
