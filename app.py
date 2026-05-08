@@ -12,7 +12,7 @@ def preprocess(file):
 
     # 첫 줄 제거
     df = df.drop(0)
-
+st.write(df.head())  # 
     # 👉 필요한 열 위치로 정확히 선택 (너 엑셀 기준)
     df = df.iloc[:, [0, 1, 2, 3, 6, 9, 12]]
 
